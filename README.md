@@ -1,11 +1,12 @@
-# SNES Asset Editor
+# Mix Engine
 
-> Codinome deste projeto em `docs/PROGRESS.md`/`docs/DATA_FORMAT.md`:
-> **Prometeus**. O projeto irmão usado no desenvolvimento (`../jogo-plataforma-snes`)
-> é o **Anubis**.
+> Nos documentos internos de desenvolvimento (`docs/PROGRESS.md`/`docs/DATA_FORMAT.md`), este
+> projeto é tratado pelo codinome **Prometeus** — mesmo conteúdo, nome diferente só pra
+> diferenciar dos dois lados durante o desenvolvimento. O projeto irmão usado no desenvolvimento
+> (`../jogo-plataforma-snes`) é o **Anubis**.
 
-Ferramenta web (React + TypeScript) para importar/converter assets (sprites,
-animação, tilesets, fases) de um jogo de plataforma SNES.
+**Mix Engine** é uma ferramenta web (React + TypeScript) para importar/converter
+assets (sprites, animação, tilesets, fases) de um jogo de plataforma SNES.
 
 **Funciona sozinha:** importar imagem, fatiar metasprite, ajustar pivô/hitbox,
 sequenciar animação, montar tileset e pintar fase funcionam sem nenhuma engine
