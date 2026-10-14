@@ -3,7 +3,9 @@
 > Nos documentos internos de desenvolvimento (`docs/PROGRESS.md`/`docs/DATA_FORMAT.md`), este
 > projeto é tratado pelo codinome **Prometeus** — mesmo conteúdo, nome diferente só pra
 > diferenciar dos dois lados durante o desenvolvimento. O projeto irmão usado no desenvolvimento
-> (`../jogo-plataforma-snes`) é o **Anubis**.
+> (`../jogo-plataforma-snes`, público como
+> [mix-engine-snes-game](https://github.com/Felipe-Gomes-Amorim/mix-engine-snes-game)) é o
+> **Anubis**.
 
 **Mix Engine** é uma ferramenta web (React + TypeScript) para importar/converter
 assets (sprites, animação, tilesets, fases) de um jogo de plataforma SNES.
