@@ -5,6 +5,37 @@
 
 ## Status atual
 
+**✅ Repositório pronto pro primeiro commit público — Mario removido dos testes, LICENSE (MIT),
+conteúdo real do usuário fora do git (2026-10-14, Prometeus).** Continuação da avaliação "dá pra
+publicar?" desta mesma sessão (ver entrada "`engineDir` unificado" logo abaixo).
+- **Fixtures de teste do Mario substituídos por formas sintéticas**: `tests/fixtures/
+  marioSheet16x32.ts`/`marioSheet32.ts` (pixel art real do Mario codificada como hex — achado
+  crítico de IP, não só estético) viraram `syntheticSheet16x32.ts`/`syntheticSheet32.ts`
+  (retângulos abstratos, gerados programaticamente e validados contra a MESMA suíte de testes
+  antes de substituir — frame count, peças 8x8/16x16, ausência/presença de corte etc. são todos
+  estruturais, recalculados do conteúdo real do array, não hardcoded, então qualquer pixel art
+  não-degenerada do tamanho certo serviria). Identificadores (`MARIO16_SHEET_*` etc.), nomes de
+  teste e base-names de exemplo (`'marioteste'`→`'testchar'`, `'mario'`→`'hero'`) também
+  renomeados em `tests/hitbox.test.ts`/`tests/metasprite.test.ts`/`tests/preview.test.ts`/
+  `tests/characterDiscovery.test.ts`/`src/lib/metasprite/slicer.ts` (comentário). As imagens
+  `samples/marioteste-*.png` (nunca comitadas) foram deixadas no disco, só excluídas do git (ver
+  abaixo) — não fazem mais falta: nenhum teste automatizado depende delas, só eram úteis pra
+  upload manual exploratório.
+- **`.gitignore`** ganhou `assets/tilesets/`, `assets/backgrounds/` e `samples/` — conteúdo real
+  do usuário (tilesets/fundos salvos, imagens de exemplo) continua no disco desta máquina, nunca
+  vai pro repositório público. Pedido explícito do usuário: um clone novo começa **vazio** (sem
+  personagem/inimigo/sprite/tileset/fase nenhum pré-pronto), o próprio usuário importa a arte dele.
+- **`LICENSE`** (MIT, escolhida pelo usuário entre MIT/Apache-2.0/GPL-3.0/nenhuma) + campo
+  `license` em `package.json` + seção no README.
+- **1º commit de verdade criado** (`6b7bfb6`, em cima do skeleton inicial único que existia) —
+  149 arquivos, todo o trabalho de sessões anteriores que nunca tinha sido commitado. Revisão
+  manual do que seria incluído antes de comitar (sem `editor.local.json`, sem `assets/tilesets`/
+  `assets/backgrounds`/`samples`, sem segredo/token/chave em nenhum arquivo — scan específico
+  feito). **Nada foi pushado** — repositório ainda não tem remote configurado, isso fica pro
+  usuário decidir quando/onde (GitHub, privado/público).
+Verificado: `npx tsc -b`, `npm test` (264/264, com os fixtures sintéticos), `npm run build`,
+`npm run lint`, `npm run test:e2e` (24/24) — todos limpos antes do commit.
+
 **✅ `engineDir` unificado entre export de arquivos e build/"Jogar" (2026-10-14, Prometeus).**
 Contexto: avaliando deixar este repo público, notei que `/api/export-gfx`
 (`vite-export-gfx-plugin.ts`) usava uma constante própria, hardcoded
