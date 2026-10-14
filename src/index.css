@@ -1,37 +1,157 @@
+/* ============================================================================================
+   Tema "SNES modding tool" (pedido do usuário, 2026-09-23) — vibe Lunar Magic + Super Mario
+   Maker: fundo roxo estrelado (tipo tela do ZSNES), painéis com moldura tipo janela de ferramenta
+   retrô, botões grandes e "clicáveis" (Mario Maker), tipografia pixelada só nos títulos (Press
+   Start 2P — ilegível em textos longos, então só onde vira "logo") + fonte redonda e amigável no
+   resto (Baloo 2, ver index.html pros imports). Sempre no tema escuro roxo — não é mais um "modo
+   escuro" opcional, é a identidade visual do site.
+   ============================================================================================ */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --error: #c0392b;
+  /* Paleta base (espaço/roxo) */
+  --bg-void: #0a0416;
+  --bg-space-1: #1a0b2e;
+  --bg-space-2: #2d1650;
+  --bg-panel: #241638;
+  --bg-panel-raised: #2e1c48;
+  --bg-inset: #180d28;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Texto */
+  --text: #c3b3e0;
+  --text-h: #fdf8ff;
+  --text-dim: #8a7aa8;
 
-  font: 16px/145% var(--sans);
-  color-scheme: light dark;
+  /* Acentos — dourado (Lunar Magic/SNES chrome) + roxo/rosa (Mario Maker) */
+  --accent: #ffb703;
+  --accent-h: #ffd166;
+  --accent-bg: rgba(255, 183, 3, 0.14);
+  --accent-2: #c084fc;
+  --accent-2-bg: rgba(192, 132, 252, 0.16);
+  --pink: #ff6fae;
+
+  --border: #4a3470;
+  --border-soft: #3a2758;
+  --success: #4ade80;
+  --error: #ff6b6b;
+  --warn: #ffd166;
+
+  --sans: 'Baloo 2', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --pixel: 'Press Start 2P', 'Baloo 2', system-ui, sans-serif;
+
+  font: 16px/150% var(--sans);
+  color-scheme: dark;
   color: var(--text);
-  background: var(--bg);
+  background: var(--bg-void);
   -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Fundo estrelado animado — 3 camadas de estrela em tamanhos/velocidades diferentes (paralaxe
+   leve), sobre um gradiente de espaço roxo. Tudo CSS puro (sem canvas/imagem), fixo atrás de todo
+   o conteúdo. `background-attachment: fixed` faria o mesmo efeito de "não rolar com a página" só
+   com CSS no body, mas um container próprio deixa mais fácil animar cada camada de estrela numa
+   velocidade diferente sem afetar o layout do resto do app.
+   --------------------------------------------------------------------------------------------- */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 30% 20%, var(--bg-space-2) 0%, var(--bg-space-1) 45%, var(--bg-void) 100%);
+}
+
+.starfield-layer {
+  position: absolute;
+  inset: -10% -10% 0 -10%;
+  width: 120%;
+  height: 220%;
+  background-repeat: repeat;
+  opacity: 0.8;
+}
+
+.starfield-layer-1 {
+  background-image: radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 120px 80px, #fff, transparent), radial-gradient(1.5px 1.5px at 60px 150px, #fff, transparent),
+    radial-gradient(1px 1px at 200px 20px, #fff, transparent), radial-gradient(1px 1px at 160px 190px, #fff, transparent);
+  background-size: 240px 240px;
+  animation:
+    starDrift 180s linear infinite,
+    starTwinkle 4s ease-in-out infinite alternate;
+}
+
+.starfield-layer-2 {
+  background-image: radial-gradient(1px 1px at 40px 60px, var(--accent-h), transparent),
+    radial-gradient(1.5px 1.5px at 180px 40px, #fff, transparent), radial-gradient(1px 1px at 100px 180px, #fff, transparent),
+    radial-gradient(1px 1px at 240px 120px, var(--accent-2), transparent);
+  background-size: 320px 320px;
+  animation:
+    starDrift 260s linear infinite reverse,
+    starTwinkle 6s ease-in-out infinite alternate-reverse;
+}
+
+.starfield-layer-3 {
+  background-image: radial-gradient(2px 2px at 80px 100px, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 260px 200px, #fff, transparent), radial-gradient(1px 1px at 300px 40px, #fff, transparent);
+  background-size: 400px 400px;
+  opacity: 0.5;
+  animation: starDrift 340s linear infinite;
+}
+
+@keyframes starDrift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes starTwinkle {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starfield-layer {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Casca do app — janela flutuando sobre o céu estrelado, tipo o quadro de ferramenta de um editor
+   de ROM. Título em fonte pixelada (só ele — em qualquer coisa maior que um título vira ilegível).
+   --------------------------------------------------------------------------------------------- */
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 16px 64px;
+  transition: max-width 0.15s ease;
+}
+
+/* Editor de fases pedindo mais espaço horizontal (ver .stage-viewport-area/.stage-toolbar) —
+   alarga a "janela" inteira do app só enquanto essa tela precisa, sem mexer no layout das demais
+   abas. */
+.app:has(.stage-workspace-wide) {
+  max-width: 1280px;
+}
+
+.app-header {
+  margin-bottom: 20px;
 }
 
 h1,
@@ -41,8 +161,13 @@ h2 {
 }
 
 h1 {
-  font-size: 28px;
-  margin: 0;
+  font-family: var(--pixel);
+  font-size: 20px;
+  line-height: 1.5;
+  margin: 0 0 10px;
+  color: var(--accent-h);
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.02em;
 }
 
 h2 {
@@ -50,64 +175,359 @@ h2 {
   margin: 0 0 8px;
 }
 
-.app {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 32px 16px;
+h4 {
+  color: var(--accent-h);
+  font-size: 15px;
+  font-weight: 700;
+  margin: 22px 0 6px;
+}
+
+/* Abas de topo — tipo pasta suspensa de ferramenta retrô: a ativa "sobe" e gruda no painel
+   abaixo, as inativas ficam mais escuras/recuadas, como uma aba de fundo. Linha inteira em flex
+   (docs/PROGRESS.md, "botão Jogar") pra encostar o botão "Jogar" no canto direito, igual à barra
+   de ferramenta de topo da Unity — as abas continuam num `.top-nav-tabs` próprio, sem disputar
+   layout com ele. */
+.top-nav {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.top-nav-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.top-nav-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--pixel);
+  font-size: 11px;
+  padding: 10px 18px;
+  border: 2px solid var(--border);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  background: var(--bg-panel);
+  color: var(--text-dim);
+  box-shadow: 0 -2px 0 rgba(0, 0, 0, 0.2) inset;
+  transform: translateY(3px);
+  transition:
+    transform 0.12s ease,
+    color 0.12s ease,
+    background 0.12s ease;
+}
+
+.top-nav-tabs button svg {
+  flex-shrink: 0;
+}
+
+.top-nav-tabs button:hover {
+  color: var(--text-h);
+  background: var(--bg-panel-raised);
+}
+
+.top-nav-active {
+  background: var(--bg-panel-raised) !important;
+  color: var(--accent-h) !important;
+  border-color: var(--accent) !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 -3px 0 var(--accent-bg) inset !important;
+}
+
+/* Botão "Jogar" (estilo Unity, docs/PROGRESS.md "botão Jogar") — destacado (cor de destaque
+   sólida) pra se diferenciar das abas-pasta ao lado; fica alinhado pela base com elas
+   (`align-items: flex-end` do `.top-nav` pai), não "sobe"/"desce" como as abas ativas/inativas. */
+.play-button-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-bottom: 3px;
+}
+
+.play-button-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.play-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--pixel);
+  font-size: 12px;
+  padding: 10px 20px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent-bg);
+  color: var(--accent-h);
+  min-width: 112px;
+  justify-content: center;
+  transition:
+    background 0.12s ease,
+    transform 0.08s ease;
+}
+
+.play-button:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--bg-space-1);
+}
+
+.play-button:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.play-emulator-link {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+}
+
+.play-emulator-link:hover:not(:disabled) {
+  color: var(--text-h);
+}
+
+.play-emulator-link:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* Flutua por cima do conteúdo abaixo (docs/PROGRESS.md, "botão Jogar") — mesmo espírito do
+   TilePickerModal: erro de build/emulador não devia empurrar o resto do cabeçalho pra baixo. */
+.play-status {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  width: min(480px, 90vw);
+  margin-top: 8px;
+  padding: 12px 14px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-panel-raised);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.play-status-error {
+  border-color: var(--error);
+}
+
+main {
+  position: relative;
 }
 
 .hint {
-  color: var(--text);
+  color: var(--text-dim);
   font-size: 14px;
   margin: 4px 0 0;
 }
 
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin: 24px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.tabs button {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 8px 12px;
-  font: inherit;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.tabs button.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-
+/* ---------------------------------------------------------------------------------------------
+   Painéis — janela de ferramenta: fundo levemente translúcido sobre o céu, moldura dupla (borda +
+   glow sutil), cantos arredondados. Mesmo tratamento em todo painel/caixa da tela (galeria de
+   personagem, tileset, entidade etc.) pra tudo parecer parte do MESMO app, não pedaços soltos.
+   --------------------------------------------------------------------------------------------- */
 .panel {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
+  border: 2px solid var(--border);
+  border-radius: 0 12px 12px 12px;
+  padding: 22px;
+  background: linear-gradient(180deg, var(--bg-panel-raised), var(--bg-panel));
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
+.saved-characters,
+.saved-stage,
+.stage-tileset-tray,
+.stage-entity-panel,
+.kind-choice,
+.live-preview {
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--bg-inset);
+}
+
+.saved-characters,
+.saved-stage {
+  margin: 14px 0 20px;
+  padding: 14px 18px;
+}
+
+.stage-tileset-tray {
+  margin: 12px 0;
+  padding: 12px 14px;
+}
+
+.stage-entity-panel {
+  margin-top: 10px;
+  padding: 12px 14px;
+}
+
+.kind-choice {
+  margin: 16px 0 0;
+  padding: 10px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.kind-choice legend {
+  color: var(--accent-h);
+  padding: 0 6px;
+  font-weight: 700;
+}
+
+.saved-characters h3,
+.saved-stage h3 {
+  color: var(--accent-h);
+  font-size: 15px;
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+
+.sequencer {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 2px dashed var(--border-soft);
+}
+
+.sequencer h3 {
+  color: var(--accent-h);
+  font-size: 16px;
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Botões — grandes, redondos, "apertáveis" (Super Mario Maker): sobem um pouco no hover, afundam
+   no clique (`:active`), sombra inferior sólida simulando profundidade em vez de blur genérico.
+   --------------------------------------------------------------------------------------------- */
 button {
   font: inherit;
   cursor: pointer;
 }
 
 .panel > button,
-.preview button {
-  margin-top: 12px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--accent);
-  background: var(--accent-bg);
-  color: var(--accent);
+.preview button,
+.actions button,
+.sequencer > .actions button {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 4px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(180deg, var(--accent-h), var(--accent));
+  color: #3a2200;
+  box-shadow: 0 4px 0 #b3790a, 0 6px 10px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+}
+
+.panel > button:hover,
+.preview button:hover,
+.actions button:hover {
+  transform: translateY(-1px);
+}
+
+.panel > button:active,
+.preview button:active,
+.actions button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #b3790a, 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.panel > button:disabled,
+.preview button:disabled,
+.actions button:disabled {
+  background: var(--border-soft);
+  color: var(--text-dim);
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botões secundários (Cancelar/Excluir/Fechar) — mesmo cantos arredondados dos outros elementos
+   com borda (painel/tile/input), cor neutra em vez do dourado principal, pra não competir com a
+   ação primária de cada tela. */
+.row-actions button,
+.saved-stage button,
+.saved-characters button,
+.stage-entity-panel .actions button:not(:first-child) {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 7px 16px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text);
+  box-shadow: 0 3px 0 var(--bg-void);
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+}
+
+.row-actions button:hover,
+.saved-stage button:hover,
+.saved-characters button:hover {
+  color: var(--text-h);
+  border-color: var(--accent-2);
+}
+
+.row-actions button:active,
+.saved-stage button:active,
+.saved-characters button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--bg-void);
+}
+
+.row-actions button:disabled,
+.saved-stage button:disabled,
+.saved-characters button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .error {
   color: var(--error);
   font-size: 14px;
+}
+
+.error-list {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+.success {
+  color: var(--success);
+  font-size: 14px;
+  margin: 12px 0 0;
+}
+
+.warn {
+  color: var(--warn);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
 }
 
 .preview {
@@ -120,10 +540,12 @@ button {
   max-width: 100%;
   max-height: 300px;
   image-rendering: pixelated;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border);
+  border-radius: 6px;
   background:
-    linear-gradient(45deg, #80808022 25%, transparent 25%, transparent 75%, #80808022 75%) 0 0 / 16px 16px,
-    linear-gradient(45deg, #80808022 25%, transparent 25%, transparent 75%, #80808022 75%) 8px 8px / 16px 16px;
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 0 0 / 16px 16px,
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 8px 8px / 16px 16px,
+    var(--bg-inset);
 }
 
 .meta {
@@ -135,7 +557,7 @@ button {
 }
 
 .meta dt {
-  color: var(--text);
+  color: var(--text-dim);
 }
 
 .meta dd {
@@ -143,12 +565,1080 @@ button {
   color: var(--text-h);
 }
 
-.export-log {
-  margin-top: 16px;
-  padding: 12px;
-  background: var(--code-bg);
+.frame-grid-canvas {
+  display: block;
+  max-width: 100%;
+  image-rendering: pixelated;
+  border: 2px solid var(--border);
   border-radius: 6px;
-  font-family: var(--mono);
+  background:
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 0 0 / 16px 16px,
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 8px 8px / 16px 16px,
+    var(--bg-inset);
+}
+
+.animation-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.animation-form input,
+.sheet-options input[type='number'],
+input[type='text'],
+input[type='number'],
+select {
+  font: inherit;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--bg-inset);
+  color: var(--text-h);
+  accent-color: var(--accent);
+}
+
+/* Select — mesma caixa dos outros campos acima, mas sem a seta padrão do navegador (que não
+   combina com o resto da UI); desenhada de novo como um triângulo dourado com 2 gradientes. */
+select {
+  appearance: none;
+  padding-right: 30px;
+  cursor: pointer;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--accent-h) 50%),
+    linear-gradient(135deg, var(--accent-h) 50%, transparent 50%);
+  background-position:
+    calc(100% - 17px) 15px,
+    calc(100% - 12px) 15px;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+select:hover {
+  border-color: var(--accent-2);
+}
+
+/* Passo do cursor virou um quadrado igual aos outros ícones da barra de ferramentas (pedido do
+   usuário, 2026-09-24: "tira o texto e faz um quadrado com os números") — mesmo tamanho TOTAL de
+   um .tile-thumb (40px), sem a seta de dropdown padrão (não cabe/não combina num quadrado tão
+   pequeno) nem o rótulo "Passo do cursor:" visível (só no title/tooltip agora). */
+.stage-cursor-step-select {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  text-align: center;
+  text-align-last: center;
+  font-weight: 700;
+  border-radius: 5px;
+  background-image: none;
+}
+
+.animation-form input:focus-visible,
+.sheet-options select:focus-visible,
+.sheet-options input:focus-visible,
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+.animation-form input[type='text'] {
+  flex: 1;
+  min-width: 120px;
+}
+
+.animation-form input[type='number'] {
+  width: 80px;
+}
+
+.animation-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.animation-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.sheet-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 12px 0;
+  font-size: 14px;
+}
+
+.sheet-options input[type='number'] {
+  width: 64px;
+}
+
+/* Checkbox/radio — não dá pra "reskinar" 100% só com CSS sem perder acessibilidade nativa, mas
+   `accent-color` (suportado nos navegadores modernos) já pinta a caixa/bolinha na cor do tema em
+   vez do azul padrão do sistema, sem precisar de SVG customizado. */
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+input[type='file'] {
+  font: inherit;
   font-size: 13px;
-  overflow-x: auto;
+  color: var(--text-dim);
+}
+
+input[type='file']::file-selector-button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  margin-right: 10px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(180deg, var(--accent-2), #9d5fe0);
+  color: #fff;
+  box-shadow: 0 3px 0 #6d3aa8;
+  cursor: pointer;
+}
+
+input[type='file']::file-selector-button:hover {
+  filter: brightness(1.08);
+}
+
+.legend {
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #000;
+}
+
+.legend-8 {
+  background: rgba(255, 160, 0, 0.85);
+}
+
+.legend-hitbox {
+  background: rgba(255, 45, 85, 0.85);
+  color: #fff;
+}
+
+.legend-16 {
+  background: rgba(0, 220, 90, 0.85);
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.stats-table th,
+.stats-table td {
+  text-align: left;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.stats-table tbody tr {
+  cursor: pointer;
+}
+
+.stats-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.stats-table tbody tr.selected {
+  background: var(--accent-bg);
+}
+
+.editor-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-top: 8px;
+}
+
+.editor-main {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.inline-option {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.live-preview {
+  flex: 0 0 280px;
+  position: sticky;
+  top: 12px;
+  align-self: flex-start;
+  padding: 14px;
+}
+
+.live-preview h3 {
+  color: var(--accent-h);
+  font-size: 15px;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.live-preview-canvas {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+}
+
+.preview-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.preview-controls select {
+  font: inherit;
+  max-width: 100%;
+}
+
+.frame-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.preview .frame-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  font-size: 12px;
+}
+
+.frame-thumb canvas {
+  display: block;
+  image-rendering: pixelated;
+  background:
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 0 0 / 8px 8px,
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 4px 4px / 8px 8px,
+    var(--bg-inset);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Bandeja de blocos — "slot de item" de caixa de ferramentas: fundo recuado (inset), o bloco
+   selecionado ganha um glow dourado, meio "botão pressionado no editor de nível" (Mario Maker).
+   --------------------------------------------------------------------------------------------- */
+.tile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--bg-inset);
+  border: 1px solid var(--border-soft);
+}
+
+.tile-thumb {
+  padding: 2px;
+  border: 2px solid var(--border-soft);
+  border-radius: 5px;
+  line-height: 0;
+  cursor: pointer;
+  background: var(--bg-panel);
+  transition:
+    border-color 0.1s ease,
+    transform 0.1s ease;
+}
+
+.tile-thumb:hover {
+  border-color: var(--accent-2);
+  transform: translateY(-1px);
+}
+
+.tile-thumb-selected {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-bg), 0 0 8px var(--accent-bg);
+}
+
+.stage-tile-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stage-tile-layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  color: var(--text-dim);
+}
+
+.stage-eraser-button {
+  /* Mesmo tamanho TOTAL de um .tile-thumb normal (pedido do usuário, 2026-09-24: a borracha
+     estava menor que os blocos) — TILE_THUMB_SIZE(32) + padding(2x2) + border(2x2) = 40px, com
+     box-sizing: border-box (global) isso já inclui os dois, sobrando os mesmos 32px de conteúdo. */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.1;
+  border-style: dashed;
+  color: var(--text-dim);
+}
+
+/* Ícone de personagem/inimigo na barra de ferramentas (EntityPickerThumb, StageSession.tsx,
+   2026-09-24) — mesmo modelo visual de .tile-thumb (pedido do usuário: "usa o mesmo modelo dos
+   tiles"), sprite ENCAIXADO (contain) num quadrado ENTITY_ICON_SIZE em vez do círculo colorido que
+   os marcadores no canvas usam (`.entity-sprite-fallback`, contexto diferente — não reusar aqui,
+   fundo/borda já vêm do próprio `.tile-thumb`). */
+.entity-picker-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.stage-eraser-button.tile-thumb-selected {
+  border-color: var(--accent) !important;
+  color: var(--accent-h);
+}
+
+.tile-thumb canvas {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  image-rendering: pixelated;
+  background:
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 0 0 / 8px 8px,
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 4px 4px / 8px 8px,
+    var(--bg-inset);
+}
+
+.stage-tileset-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stage-tileset-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+.stage-width-picker {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.stage-add-tileset {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.stage-tileset-band {
+  margin-bottom: 10px;
+}
+
+/* Modal de escolha de bloco (pedido do usuário, 2026-09-24) — paleta de bloco avulso recolhida na
+   barra de ferramentas (só o bloco atual aparece); clicar abre isso por cima de tudo (React portal,
+   ver TilePickerModal em StageSession.tsx) em vez de expandir inline (ficava com layout quebrado
+   com muitos blocos). Fade + leve "pop" de escala ao abrir. */
+@keyframes tilePickerModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tile-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 4, 24, 0.6);
+  backdrop-filter: blur(2px);
+  animation: tilePickerModalIn 0.12s ease-out;
+}
+
+.tile-picker-modal {
+  position: relative;
+  max-width: min(480px, 90vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px 16px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--bg-panel-raised), var(--bg-panel));
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  animation: tilePickerModalIn 0.14s ease-out;
+}
+
+.tile-picker-modal .tile-grid {
+  margin: 0;
+}
+
+.tile-picker-modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-dim);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tile-picker-modal-close:hover {
+  color: var(--text-h);
+  border-color: var(--accent-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-picker-backdrop,
+  .tile-picker-modal {
+    animation: none;
+  }
+}
+
+/* Quantização automática de paleta (docs/PROGRESS.md, "quantização automática de paleta",
+   2026-09-25) — mesmo modal-base de .tile-picker-modal, só mais largo (cabe as 2 prévias lado a
+   lado) e sem o scroll de grade de blocos. */
+.quantize-modal {
+  max-width: min(560px, 92vw);
+}
+
+.quantize-preview-pair {
+  display: flex;
+  gap: 16px;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+
+.quantize-preview-pair canvas {
+  image-rendering: pixelated;
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  max-width: 100%;
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Terrenos inteligentes (autotile, docs/PROGRESS.md "tilesets inteligentes", 2026-09-23) — lista
+   de grupos na aba Tilesets + o mini-grid 3x3 de atribuição de papel (borda/canto/preenchimento).
+   --------------------------------------------------------------------------------------------- */
+.terrain-group-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Item da lista de terrenos (pedido do usuário, 2026-09-25: ícone quadrado + nome, mesmo estilo
+   de .character-list/.tile-thumb já usados no resto da página, em vez do botão de texto solto de
+   antes) — o botão cobre a linha inteira (ícone + nome), clique em qualquer parte abre/fecha a
+   edição do grupo. */
+.terrain-group-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 8px 4px 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-h);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.terrain-group-item:hover {
+  border-color: var(--border-soft);
+  background: var(--bg-inset);
+}
+
+.terrain-group-item-active {
+  border-color: var(--accent);
+  background: var(--bg-inset);
+}
+
+.terrain-group-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: inherit;
+}
+
+.terrain-group-name {
+  font-weight: 700;
+}
+
+.terrain-group-editor {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--bg-inset);
+}
+
+.terrain-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 36px);
+  gap: 4px;
+  margin: 10px 0;
+}
+
+.terrain-role-grid-inner {
+  grid-template-columns: repeat(4, 36px);
+}
+
+.terrain-role-slot-empty {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  border-style: dashed;
+  color: var(--text-dim);
+}
+
+/* ---------------------------------------------------------------------------------------------
+   Mapa da fase — moldura de "tela do jogo" dentro da ferramenta, tipo a janela de preview do
+   Lunar Magic: borda grossa e um brilho leve, pra separar bem do resto do painel.
+
+   Viewport rolável + minimapa (docs/PROGRESS.md, "preparar o editor pra fases maiores", Fase B,
+   2026-09-23): o canvas renderiza SEMPRE no tamanho nativo dele (sem `width`/`height` fixos aqui —
+   por isso não força mais um quadrado 512x512), quem limita o que fica visível é o `.stage-viewport`
+   ao redor (`overflow: auto`, tamanho máximo controlado por `VIEWPORT_MAX_SIZE_PX` no componente,
+   passado como estilo inline pra não duplicar o número aqui). Hoje a fase inteira (256x256) cabe
+   folgada dentro desse limite, então não aparece barra de rolagem nenhuma — só quando a fase real
+   crescer (depende do Anubis fechar 🟢 o streaming) que isso passa a rolar de verdade.
+   --------------------------------------------------------------------------------------------- */
+.stage-grid-canvas {
+  display: block;
+  image-rendering: pixelated;
+  border: 3px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4), 0 8px 20px rgba(0, 0, 0, 0.4);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.stage-grid-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.stage-viewport-area {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.stage-viewport {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: auto;
+  border-radius: 6px;
+}
+
+.stage-minimap-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.stage-minimap {
+  display: block;
+  image-rendering: pixelated;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.stage-minimap-viewport {
+  position: absolute;
+  border: 2px solid var(--accent-h);
+  background: rgba(255, 209, 102, 0.15);
+  pointer-events: none;
+}
+
+/* Editor de fases — layout estilo Lunar Magic (2026-09-24, pedido explícito do usuário depois de
+   testar com uma fase maior que a tela: "coloque o viewport pra cobrir horizontalmente toda a
+   caixa de fases, mova os tiles de pintura e borracha e etc tudo pro topo"): caixa de ferramentas
+   (`.stage-toolbar`) em faixa horizontal no TOPO, mapa dominando o resto da largura embaixo — não
+   mais 2 colunas lado a lado (o mapa cabia pouco quando a fase ficava maior que 1 tela, ver
+   docs/PROGRESS.md "preparar o editor pra fases maiores"). O `.panel` que envolve isso
+   (StageWorkspace.tsx) ganha `.stage-workspace-wide` só enquanto há uma sessão de pintura ativa,
+   pra não alargar a tela à toa nas outras telas (galeria de tilesets, escolha de tilesets da fase
+   etc.). */
+.stage-editor {
+  margin-top: 8px;
+}
+
+.stage-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 14px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  background: var(--bg-inset);
+}
+
+.stage-toolbar .tile-grid {
+  margin: 0;
+}
+
+.stage-toolbar .actions {
+  margin: 0;
+}
+
+.stage-toolbar .actions button {
+  margin-top: 0;
+}
+
+.stage-grid-wrapper-entities .stage-grid-canvas {
+  cursor: default;
+}
+
+/* Painel dedicado da Camada 2 (docs/PROGRESS.md, "Camada 2 como padrão repetível", 2026-09-29) —
+   mesma moldura do canvas principal, mas a pré-visualização da repetição é só leitura (sem
+   crosshair, sem clique). */
+.stage-layer2-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.stage-layer2-preview-canvas {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Seletor de cor de fundo (docs/PROGRESS.md, "seletor de cor de fundo", 2026-09-30) — amostras das
+   cores JÁ usadas na fase (não um color picker livre), mesmo espírito quadriculado/pixel-art do
+   resto da UI. */
+.stage-backdrop-picker {
+  margin-bottom: 18px;
+}
+
+.stage-backdrop-picker h4 {
+  margin-bottom: 8px;
+}
+
+.stage-backdrop-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stage-backdrop-swatch {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.stage-backdrop-swatch-selected {
+  border-color: var(--accent-h);
+  box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.5);
+}
+
+.stage-hidden-region {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-top: 2px dashed #ff9800;
+  background: repeating-linear-gradient(45deg, #ff980033, #ff980033 6px, #ff980011 6px, #ff980011 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff9800;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 3px #000, 0 0 3px #000;
+}
+
+.stage-marker {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  line-height: 0;
+}
+
+.entity-sprite-icon {
+  display: block;
+  image-rendering: pixelated;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #0009;
+}
+
+.stage-marker-player .entity-sprite-icon {
+  box-shadow: 0 0 0 2px #2196f3, 0 0 0 3px #0009;
+}
+
+.stage-marker-enemy .entity-sprite-icon {
+  box-shadow: 0 0 0 2px #e91e63, 0 0 0 3px #0009;
+}
+
+/* Decoração (decor1, docs/DATA_FORMAT.md § 3) não tem pivô: `x`,`y` É o canto superior esquerdo
+   do quadro, ao contrário de jogador/inimigo (pivô = pé, centro-base — ver `.stage-marker`
+   acima). Sem isso, o marcador apareceria deslocado do ponto que realmente é exportado/desenhado
+   no jogo. */
+.stage-marker-decor {
+  transform: translate(0, 0);
+}
+
+.stage-marker-decor .entity-sprite-icon {
+  box-shadow: 0 0 0 2px #4caf50, 0 0 0 3px #0009;
+}
+
+/* Objeto marcado "Sólido" (docs/DATA_FORMAT.md § 3, "Comportamento de objeto: colisão +
+   propriedade especial", 2026-10-10) — anel externo na MESMA cor de colisão sólida do editor de
+   Tileset (`COLLISION_BORDER_COLOR.solid` em TilesetEditor.tsx), separado do contorno interno do
+   ícone (que já é verde por padrão pra TODA decoração) pra não ficar ambíguo com um objeto
+   atravessável comum. */
+.stage-marker-decor-solid {
+  outline: 2px solid #2e9e4f;
+  outline-offset: 3px;
+}
+
+/* Selo de propriedade especial — mesma cor da bandeira POR TILE (`COLLISION_BORDER_COLOR.goal`)
+   pra "bandeira" deixar claro que é o mesmo conceito, só que por objeto em vez de por bloco. */
+.stage-marker-special-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid #0009;
+  pointer-events: none;
+}
+
+.stage-marker-special-badge-flag {
+  background: #c0392b;
+}
+
+.stage-marker-special-badge-death {
+  background: #212121;
+}
+
+.entity-sprite-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 0 0 1px #0006;
+}
+
+.stage-marker-player .entity-sprite-fallback {
+  background: #2196f3;
+}
+
+.stage-marker-enemy .entity-sprite-fallback {
+  background: #e91e63;
+}
+
+.stage-marker-decor .entity-sprite-fallback {
+  background: #4caf50;
+}
+
+.stage-marker-selected {
+  outline: 2px solid #ffeb3b;
+  outline-offset: 2px;
+}
+
+.stage-patrol-band {
+  position: absolute;
+  height: 4px;
+  transform: translateY(-2px);
+  background: repeating-linear-gradient(90deg, #ffeb3b 0 6px, transparent 6px 12px);
+  pointer-events: none;
+}
+
+.stage-patrol-handle {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 2px solid #fff;
+  background: #ffeb3b;
+  box-shadow: 0 0 0 1px #0006;
+  padding: 0;
+  cursor: ew-resize;
+}
+
+.stage-armed {
+  outline: 2px solid var(--accent);
+}
+
+.draft-sequence {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.memory-bar {
+  width: 100%;
+  height: 10px;
+}
+
+.advanced {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.advanced summary {
+  cursor: pointer;
+  color: var(--accent-h);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .editor-layout {
+    flex-direction: column-reverse;
+  }
+
+  .live-preview {
+    flex: 0 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+    top: 0;
+    z-index: 1;
+  }
+
+  .live-preview-canvas {
+    max-width: 150px;
+  }
+
+  .preview-controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .live-preview .hint:last-child {
+    display: none;
+  }
+}
+
+.preview .name-chip {
+  margin: 0 2px;
+  padding: 1px 8px;
+  font-size: 12px;
+}
+
+.name-chip:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.build-status {
+  margin-top: 8px;
+}
+
+.build-output {
+  max-height: 320px;
+  overflow: auto;
+  margin: 6px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--bg-inset);
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-h);
+}
+
+.character-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.character-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+.character-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-h);
+  font-weight: 700;
+}
+
+.character-thumb {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  border-radius: 6px;
+  background:
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 0 0 / 8px 8px,
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 4px 4px / 8px 8px,
+    var(--bg-inset);
+  border: 1px solid var(--border-soft);
+}
+
+.character-thumb-placeholder {
+  background: var(--border-soft);
+}
+
+.stage-staleness-warning {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 4px solid var(--warn);
+  background: rgba(255, 209, 102, 0.1);
+  color: var(--text-h);
+}
+
+/* Aviso de proporção alta de "bandeira" ao salvar (docs/PROGRESS.md, 2026-09-23) — tom mais sério
+   que o aviso de staleness (borda vermelha, não amarela): é um erro de autoria que quebra a fase de
+   verdade (termina sozinha assim que o jogador nasce), não só uma referência desatualizada. */
+.stage-goal-warning {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 4px solid var(--error);
+  background: rgba(224, 76, 76, 0.1);
+}
+
+.stage-goal-warning .error {
+  margin: 0 0 8px;
+}
+
+.saved-stage-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.saved-stage-preview {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 1px solid var(--border-soft);
+  background:
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 0 0 / 8px 8px,
+    linear-gradient(45deg, #ffffff14 25%, transparent 25%, transparent 75%, #ffffff14 75%) 4px 4px / 8px 8px,
+    var(--bg-inset);
+}
+
+.saved-stage-preview-placeholder {
+  background: var(--border-soft);
 }

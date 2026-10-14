@@ -1,0 +1,72 @@
+// Cliente HTTP pros endpoints de Fundo salvo (vite-background-files-plugin.ts) — mesmo formato de
+// tilesetFiles.ts, só que apontando pra `assets/backgrounds/` DESTE projeto (Prometeus), nunca
+// `jogo-plataforma-snes/`. Só funciona com "npm run dev" rodando.
+
+import type { GfxFileEntry } from '../../lib/gfxFiles'
+import type { SaveResult } from '../../lib/saveToEngine'
+
+export async function listBackgroundFiles(): Promise<GfxFileEntry[]> {
+  try {
+    const response = await fetch('/api/background-list')
+    if (!response.ok) return []
+    const data = (await response.json()) as { ok: boolean; files?: GfxFileEntry[] }
+    return data.files ?? []
+  } catch {
+    return []
+  }
+}
+
+async function fetchBackgroundFile(name: string): Promise<Response> {
+  const response = await fetch(`/api/background-file?name=${encodeURIComponent(name)}`)
+  if (!response.ok) {
+    let message = `Não consegui ler "${name}" (HTTP ${response.status}).`
+    try {
+      const body = (await response.json()) as { message?: string }
+      if (body.message) message = body.message
+    } catch {
+      // resposta não era JSON — mantém a mensagem padrão
+    }
+    throw new Error(message)
+  }
+  return response
+}
+
+export async function readBackgroundFile(name: string): Promise<ArrayBuffer> {
+  return (await fetchBackgroundFile(name)).arrayBuffer()
+}
+
+export async function readBackgroundFileText(name: string): Promise<string> {
+  return (await fetchBackgroundFile(name)).text()
+}
+
+/** Nunca lança — falha vira `false` (apagar é best-effort, um arquivo por vez). */
+export async function deleteBackgroundFile(name: string): Promise<boolean> {
+  try {
+    const response = await fetch(`/api/background-file?name=${encodeURIComponent(name)}`, { method: 'DELETE' })
+    return response.ok
+  } catch {
+    return false
+  }
+}
+
+/** Manda um arquivo (.bmp / .json) pro endpoint do dev server (vite-background-files-plugin.ts),
+ * que escreve em `assets/backgrounds/` deste projeto. Mesmo formato de retorno de `saveToEngine`. */
+export async function saveBackgroundFile(fileName: string, body: Blob): Promise<SaveResult> {
+  try {
+    const response = await fetch('/api/background-save', {
+      method: 'POST',
+      headers: { 'X-File-Name': fileName },
+      body,
+    })
+    const result = await response.json()
+    if (!response.ok || !result.ok) {
+      return { ok: false, message: result.message ?? 'Falha ao salvar o arquivo.' }
+    }
+    return { ok: true, path: result.path }
+  } catch {
+    return {
+      ok: false,
+      message: 'Não foi possível salvar direto em disco — isso só funciona com "npm run dev" rodando.',
+    }
+  }
+}

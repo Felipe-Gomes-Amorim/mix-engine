@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Codinomes
+
+Pra evitar confundir "o editor" (esta ferramenta, num sentido genérico) com
+"a engine" (idem), os dois projetos têm codinome fixo — use-o ao se referir
+a cada lado em `docs/PROGRESS.md`, `docs/DATA_FORMAT.md` e na conversa com o
+usuário:
+
+- **Este projeto** (`snes-asset-editor`) = **Prometeus**.
+- **O projeto irmão** (`../jogo-plataforma-snes`) = **Anubis**.
+
 ## O que é este projeto
 Ferramenta web (React + TypeScript) que serve como **editor e gerenciador de
 assets** para um jogo de plataforma 2D de SNES. Duas funções principais:
@@ -10,21 +20,30 @@ assets** para um jogo de plataforma 2D de SNES. Duas funções principais:
 2. Montar visualmente as fases do jogo (editor de tilemap).
 
 O output exportado por esta ferramenta é consumido por um projeto **separado**,
-a engine do jogo em C/PVSnesLib: `../jogo-plataforma-snes`. Os dois projetos
+a Anubis, o jogo em C/PVSnesLib: `../jogo-plataforma-snes`. Os dois projetos
 são desenvolvidos em sessões/repos distintos e precisam ficar sincronizados
-via contrato de dados — ver "Contrato com a engine" abaixo.
+via contrato de dados — ver "Contrato com a Anubis" abaixo.
 
-**Status atual: bootstrap.** Ainda não há código, dependências ou build
-configurados. Nada deve ser implementado antes de o escopo do skeleton inicial
-ser confirmado com o usuário (ver `docs/PROGRESS.md` quando existir).
+**Status atual:** skeleton funcional (Vite + React + TS) com duas telas —
+importar/preview de imagem e um export de teste (JSON placeholder). Ver
+`docs/PROGRESS.md` pro estado atualizado a cada sessão (esta seção não é
+reatualizada com a mesma frequência).
 
-## Contrato com a engine
+## Contrato com a Anubis
 `docs/DATA_FORMAT.md` é a fonte de verdade sobre os formatos de arquivo
-trocados entre este editor e a engine em C. Ele é espelhado em
-`../jogo-plataforma-snes/docs/DATA_FORMAT.md` — se um lado mudar, o outro
-precisa ser atualizado também. Cada seção do documento tem um status
-(🔴 não definido / 🟡 rascunho / 🟢 fechado): **não implemente um
-exportador/parser de uma seção enquanto ela não estiver 🟢.**
+trocados entre este projeto (Prometeus) e a Anubis, em C. Ele é espelhado em
+`../jogo-plataforma-snes/docs/DATA_FORMAT.md` e **precisa ser idêntico nos
+dois projetos**. Cada seção do documento tem um status (🔴 não definido /
+🟡 rascunho / 🟢 fechado): **não implemente um exportador/parser de uma
+seção enquanto ela não estiver 🟢.**
+
+**Sempre que `docs/DATA_FORMAT.md` for editado nesta sessão** (aqui, no
+snes-asset-editor), copie o arquivo atualizado por cima de
+`../jogo-plataforma-snes/docs/DATA_FORMAT.md` no mesmo passo, sem precisar
+que o usuário peça — os dois arquivos existem no mesmo disco, então isso é
+só um `cp`, não uma tarefa do outro projeto. Registre no `docs/PROGRESS.md`
+de lá também (uma linha de log basta) pra próxima sessão daquele projeto
+saber que mudou.
 
 ## Antes de codar
 1. Confirme o escopo da tarefa com o usuário se não estiver claro — este
@@ -34,7 +53,11 @@ exportador/parser de uma seção enquanto ela não estiver 🟢.**
 3. Ao terminar uma tarefa, atualize `docs/PROGRESS.md` (criar o arquivo se
    ainda não existir) com o que mudou e o que falta.
 
-## Stack (planejada)
-- React + TypeScript.
-- Toolchain de build/lint/test ainda não definida — será registrada aqui
-  assim que o skeleton inicial for implementado.
+## Stack
+- React + TypeScript, build com Vite (`npm run dev`/`npm run build`).
+- Lint: oxlint (`npm run lint`, config em `.oxlintrc.json`).
+- Teste: Playwright (fluxo completo no navegador, `e2e/`): `npm run test:e2e`
+  — ver README.md "Testes E2E" pro isolamento (nunca escreve nos arquivos
+  reais da Anubis/tilesets do usuário). Lógica pura (fatiador de
+  metasprites em `src/lib/metasprite/`, tilemap, etc.) tem testes
+  unitários com `node:test`: `npm test` (`tests/`, sem dependências).

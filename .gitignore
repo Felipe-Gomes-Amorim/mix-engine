@@ -22,3 +22,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Configuração local desta máquina (caminhos da PVSnesLib/Git Bash/make) — ver editor.local.example.json
+editor.local.json
+
+# Artefatos de teste E2E (Playwright) — ver README.md "Testes E2E"
+test-results
+playwright-report
+blob-report
+
+# Conteúdo real do usuário (tilesets/fundos salvos, imagens de exemplo pra testar upload) — fica no
+# disco desta máquina, nunca vai pro repositório público. Um clone novo começa vazio: sem
+# tileset/fundo/personagem/fase nenhum pré-pronto, o próprio usuário importa a arte dele.
+assets/tilesets/
+assets/backgrounds/
+samples/
