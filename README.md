@@ -1,3 +1,6 @@
+<img width="2014" height="781" alt="mix" src="https://github.com/user-attachments/assets/3abab174-d963-40db-8fd0-10ecee934d7a" />
+
+
 # Mix Engine
 
 > Nos documentos internos de desenvolvimento (`docs/PROGRESS.md`/`docs/DATA_FORMAT.md`), este
